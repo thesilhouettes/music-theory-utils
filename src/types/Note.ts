@@ -28,15 +28,19 @@ export const AccidentalValues = new TwoWayMap<Accidental, number>({
   //  "♭" : -1, // U+226D
   bb: -2,
   //  "𝄫" : -2, // U+1D12B
+  bbb: -3,
+  //  "♭𝄫" : -3, // I am not so sure about this one
   "#": +1,
   // "♯" : +1, // U+266F
   x: +2,
+  "#x": +3,
   // "𝄪" : +2, // U+1D12A
   // "♮" : 0, // U+266E
+  // "♯𝄪" : +3,
   "": 0,
 });
 
-export type Accidental = "b" | "bb" | "#" | "x" | "";
+export type Accidental = "b" | "bb" | "bbb" | "#" | "x" | "#x" | "";
 
 export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
 
@@ -45,9 +49,9 @@ export class Note {
   octave: Octave;
   accidental: Accidental;
 
-  constructor(pitch: Letter, accidental: Accidental, octave?: Octave) {
+  constructor(pitch: Letter, accidental?: Accidental, octave?: Octave) {
     this.pitch = pitch;
-    this.accidental = accidental;
+    this.accidental = accidental || "";
     this.octave = octave || null;
   }
 
@@ -127,10 +131,10 @@ export class Note {
     let nextInterval = (this.value + +interval) % 12;
     let nextLetterValue = LetterValues.get(nextLetter)!;
     // now we only focus on simple intervals
-    for (let accidental of ["bb", "b", "", "#", "x"]) {
+    for (let accidental of ["", "#", "b", "x", "bb", "#x", "bbb"]) {
       let withAccidental =
         nextLetterValue + AccidentalValues.get(accidental as Accidental)!;
-      if (withAccidental > 12) {
+      if (withAccidental >= 12) {
         withAccidental -= 12;
       } else if (withAccidental < 0) {
         withAccidental += 12;
