@@ -56,7 +56,7 @@ export class Note {
   }
 
   get value() {
-    let add =
+    const add =
       LetterValues.get(this.pitch)! + AccidentalValues.get(this.accidental)!;
     // loop around if it is out of [0, 11]
     if (add > 11) {
@@ -82,24 +82,24 @@ export class Note {
     return 1;
   }
 
-  static fromAbsoluteNoteValue(absoluteValue: number, accidental: Accidental) {}
+  // static fromAbsoluteNoteValue(absoluteValue: number, accidental: Accidental) {}
 
-  static fromNoteValue(
-    value: number,
-    accidental: Accidental,
-    octave?: number
-  ) {}
+  // static fromNoteValue(
+  //   value: number,
+  //   accidental: Accidental,
+  //   octave?: number
+  // ) {}
 
-  static from(str: string) {
-    // TODO: return a Note from the string representation
-  }
+  // static from(str: string) {
+  //   // TODO: return a Note from the string representation
+  // }
 
   static isAllTheSameType(...notes: Note[]) {
     if (!notes.length) {
       return true;
     }
-    let first = notes[0].octave !== null;
-    for (let note of notes) {
+    const first = notes[0].octave !== null;
+    for (const note of notes) {
       if (first && note.octave === null) {
         return false;
       }
@@ -111,11 +111,11 @@ export class Note {
   }
 
   static addLetter(letter: Letter, degree: number) {
-    let index = DegreeValues.get(letter)!;
+    const index = DegreeValues.get(letter)!;
     if (degree > 1) {
       return DegreeValues.getRev((index + degree - 1) % 7)!;
     } else if (degree < -1) {
-      let remainder = (index + degree) % 7;
+      const remainder = (index + degree) % 7;
       return DegreeValues.getRev(
         remainder > 0 ? remainder + 1 : remainder + 8
       )!;
@@ -128,10 +128,10 @@ export class Note {
     const nextLetter = Note.addLetter(this.pitch, interval.number);
 
     // find which note fits
-    let nextInterval = (this.value + +interval) % 12;
-    let nextLetterValue = LetterValues.get(nextLetter)!;
+    const nextInterval = (this.value + +interval) % 12;
+    const nextLetterValue = LetterValues.get(nextLetter)!;
     // now we only focus on simple intervals
-    for (let accidental of ["", "#", "b", "x", "bb", "#x", "bbb"]) {
+    for (const accidental of ["", "#", "b", "x", "bb", "#x", "bbb"]) {
       let withAccidental =
         nextLetterValue + AccidentalValues.get(accidental as Accidental)!;
       if (withAccidental >= 12) {

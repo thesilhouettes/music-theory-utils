@@ -7,9 +7,7 @@ export class TwoWayMap<K extends KeyType, V extends KeyType> {
   constructor(obj: Record<K, V>) {
     this.map = {};
     this.revMap = {};
-    for (let key in obj) {
-      if (obj[key]) {
-      }
+    for (const key in obj) {
       this.map[key] = obj[key];
       this.revMap[obj[key]] = key;
     }

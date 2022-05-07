@@ -1,5 +1,4 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
-import { Note } from "./Note";
 
 type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -57,11 +56,11 @@ export class Interval {
   }
 
   valueOf() {
-    let octaves = Math.floor(this.number / 8);
-    let simpleDegree = IntervalValues.get(
+    const octaves = Math.floor(this.number / 8);
+    const simpleDegree = IntervalValues.get(
       ((this.number + octaves) % 8) as SimpleInterval
-    )!;
-    let octaveInterval = octaves * 12;
+    ) as number;
+    const octaveInterval = octaves * 12;
 
     if (this.isPerfectInterval()) {
       return (

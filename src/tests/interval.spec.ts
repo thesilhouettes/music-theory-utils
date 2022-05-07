@@ -3,7 +3,7 @@ import { Interval } from "../types/Interval";
 describe("intervals", () => {
   describe("constructor", () => {
     test("split the interval correctly", function () {
-      let interval = new Interval("A3");
+      const interval = new Interval("A3");
       expect(interval.number).toEqual(3);
       expect(interval.quality).toEqual("A");
     });

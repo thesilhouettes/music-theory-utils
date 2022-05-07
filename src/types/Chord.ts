@@ -43,7 +43,7 @@ export class Chord {
   toString() {
     let acc = this.base + " ";
     let current = this.base;
-    for (let interval of this.intervals) {
+    for (const interval of this.intervals) {
       current = current.addInterval(interval);
       acc += current + " ";
     }
