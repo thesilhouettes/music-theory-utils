@@ -2,8 +2,8 @@ import { TwoWayMap } from "../utils/TwoWayMap";
 import { Interval } from "./Interval";
 
 /**
- * Represent how the key letters map to a position within an octave
- * Starts from `0`
+ * Represent how the key letters map to a position within an octave.
+ * Starts from `0`.
  */
 export const LetterValues = new TwoWayMap<Letter, number>({
   C: 0,
@@ -16,13 +16,13 @@ export const LetterValues = new TwoWayMap<Letter, number>({
 });
 
 /**
- * Represent the available note letter inside an octave
+ * Represent the available note letter inside an octave.
  */
 export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 /**
  * Represents a simple mapping between letter names to a number
- * Also a zero-indexed C major scale degrees
+ * Also a zero-indexed C major scale degrees.
  */
 export const DegreeValues = new TwoWayMap<Letter, number>({
   C: 0,
@@ -35,8 +35,8 @@ export const DegreeValues = new TwoWayMap<Letter, number>({
 });
 
 /**
- * Represents a mapping between accidentals and the modifying value
- * For example, since a sharp raises a half step, the value of it is "+1"
+ * Represents a mapping between accidentals and the modifying value.
+ * For example, since a sharp raises a half step, the value of it is "+1".
  */
 export const AccidentalValues = new TwoWayMap<Accidental, number>({
   b: -1,
@@ -56,12 +56,12 @@ export const AccidentalValues = new TwoWayMap<Accidental, number>({
 });
 
 /**
- * Represents the available accidental names
+ * Represents the available accidental names.
  */
 export type Accidental = "b" | "bb" | "bbb" | "#" | "x" | "#x" | "";
 
 /**
- * Represents the available octave numbers, and `null` if the note is relative
+ * Represents the available octave numbers, and `null` if the note is relative.
  */
 export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
 
@@ -70,25 +70,25 @@ export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
  */
 export class Note {
   /**
-   * note name without quality, like white keys on a piano
-   * for the quality, please refer to {@link Note.accidental}
+   * note name without quality, like white keys on a piano.
+   * For `quality`, please refer to {@link Note.accidental}
    */
   pitch: Letter;
   /**
-   * which octave the note is in
-   * if the value is `null`, then do not care about the octave
-   * these kinds of notes are reffered as **relative notes**
+   * Which octave the note is in.
+   * If the value is `null`, that means it is a relative note.
+   * That means all relative notes are treated like they are on the same octave.
    */
   octave: Octave;
   /**
-   * the quality of that note.
+   * The quality of that note. (how sharp or flat it is).
    */
   accidental: Accidental;
 
   /**
-   * constructs an instace of `Note`
+   * Constructs an instance of `Note`
    *
-   * @param pitch the not name without quality
+   * @param pitch the note name without quality
    * @param accidental the quality of the note, default `""`
    * @param octave the octave number, default `null`
    */
@@ -99,7 +99,7 @@ export class Note {
   }
 
   /**
-   * calculates where the note is
+   * Calculates where the note is.
    * @returns 0 to 11 if the note is relative, positive integer if the note is absolute
    */
   get value() {
@@ -117,7 +117,7 @@ export class Note {
 
   /**
    * Calculate the number of half steps between the current note and an input
-   * note
+   * note.
    * @remarks currently only returns the absolute difference between the two notes
    * @param rhs another note
    * @returns a non-negative integer representing the number of half steps between two notes
@@ -162,8 +162,8 @@ export class Note {
   }
 
   /**
-   * Add a degree number to a letter, ignoring the quality
-   * If the degree is negative, then it will count downards.
+   * Add a degree number to a letter, ignoring the quality.
+   * If the degree is negative, then it will count downwards.
    * @param letter the base letter
    * @param degree how many steps to add, can be negative.
    * @returns a new letter
@@ -188,7 +188,7 @@ export class Note {
   }
 
   /**
-   * Add an interval to the current note
+   * Add an interval to the current note.
    * @param interval the interval to be added
    * @returns a new note after adding
    *
@@ -222,7 +222,7 @@ export class Note {
   }
 
   /**
-   * Check if two notes are equal
+   * Check if two notes are equal.
    *
    *  Two notes are said to be equal if they have:
    *  - the same pitch
@@ -240,7 +240,6 @@ export class Note {
   }
 
   /**
-   *
    * @returns a string representation of the note
    *
    * @example

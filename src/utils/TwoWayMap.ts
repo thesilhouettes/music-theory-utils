@@ -14,7 +14,7 @@ export class TwoWayMap<K extends KeyType, V extends KeyType> {
   private revMap: Partial<Record<V, K>>;
 
   /**
-   * Get the keys of the obj and populate the data structure
+   * Get the keys of the obj and populate the data structure.
    * @param obj the keys and values that should be inserted into the map
    */
   constructor(obj: Record<K, V>) {
@@ -27,7 +27,7 @@ export class TwoWayMap<K extends KeyType, V extends KeyType> {
   }
 
   /**
-   * Get the value from a key
+   * Get the value from a key.
    * @param key the name of key
    * @returns the value associated with it if found, `undefined` otherwise
    */
@@ -36,7 +36,7 @@ export class TwoWayMap<K extends KeyType, V extends KeyType> {
   }
 
   /**
-   * Get the key from a key
+   * Get the key from a key.
    * @param value the value of a key
    * @returns the key of it is found, `undefined` otherwise
    */

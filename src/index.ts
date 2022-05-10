@@ -1,32 +1,13 @@
-import {
-  Note,
-  Accidental,
-  AccidentalValues,
-  DegreeValues,
-  Letter,
-  LetterValues,
-  Octave,
-} from "./types/Note";
-import { Chord } from "./types/Chord";
-import {
-  ImperfectQuality,
-  ImperfectQualityValue,
-  Interval,
-} from "./types/Interval";
-import { TwoWayMap, KeyType } from "./utils/TwoWayMap";
+/**
+ * This is a music theory library that helps you generate scales,
+ * chords, notes, calculate intervals and so on.
+ *
+ * @module music-theory-utils
+ *
+ */
 
-export {
-  Note,
-  Accidental,
-  AccidentalValues,
-  DegreeValues,
-  Letter,
-  LetterValues,
-  Octave,
-  Chord,
-  ImperfectQuality,
-  ImperfectQualityValue,
-  Interval,
-  TwoWayMap,
-  KeyType,
-};
+// re-exports
+export * from "./types/Chord";
+export * from "./types/Interval";
+export * from "./types/Note";
+export * from "./utils/TwoWayMap";

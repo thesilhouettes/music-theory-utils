@@ -3,7 +3,7 @@ import { TwoWayMap } from "../utils/TwoWayMap";
 type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /**
- * Scale degrees to half-steps
+ * Scale degrees to half-steps.
  */
 const IntervalValues = new TwoWayMap<SimpleInterval, number>({
   1: 0,
@@ -16,8 +16,8 @@ const IntervalValues = new TwoWayMap<SimpleInterval, number>({
 });
 
 /**
- * Mapping between perfect qualities and its value
- * For example, augmented interval raises the note up by one, so the value is 1
+ * Mapping between perfect qualities and its value.
+ * For example, augmented interval raises the note up by one, so the value is 1.
  */
 export const PerfectQualityValue = new TwoWayMap({
   P: 0,
@@ -26,13 +26,14 @@ export const PerfectQualityValue = new TwoWayMap({
 });
 
 /**
- * A perfect interval can be perfect (P), augmented (A) or diminished (d)
+ * A perfect interval can be perfect (P), augmented (A) or diminished (d).
  */
 export type PerfectQuality = "P" | "A" | "d";
 
 /**
- * Mapping between imperfect qualities and its value For example, a minor
- * interval lowers the note down by one, so the value is -1
+ * Mapping between imperfect qualities and its value.
+ * For example, a minor interval lowers the note down by one, so the value is
+ * -1.
  */
 export const ImperfectQualityValue = new TwoWayMap({
   d: -2,
@@ -42,30 +43,32 @@ export const ImperfectQualityValue = new TwoWayMap({
 });
 
 /**
- * An imperfect interval can augmented (A), major (M), minor (m) or diminished (d)
+ * An imperfect interval can augmented (A), major (M), minor (m) or diminished
+ * (d).
  */
 export type ImperfectQuality = "d" | "m" | "M" | "A";
 
 /**
- * Represents an interval, without storing the notes on the two ends
+ * Represents an interval, without storing the notes on the two ends.
  */
 export class Interval {
   /**
-   * The quality of the note, can be perfect or imperfect depending on the number
+   * The quality of the note, can be perfect or imperfect depending on the
+   * number.
    * @see {@link PerfectQuality} and {@link ImperfectQuality}
    */
   public quality: PerfectQuality | ImperfectQuality;
   /**
-   * The generic interval
+   * The generic interval.
    */
   public number: number;
 
   /**
-   * Construct an interval from a string
+   * Construct an interval from a string.
    * @param str a string representation of an interval, like "A3" (augmented third)
    * @remarks The interval string must be valid, here are some examples of invalid strings:
-   * - M5 (major fifth)
-   * - a0 (does not make any sense)
+   * - `M5` (major fifth)
+   * - `a0` (does not make any sense)
    * @throws Error if the string is invalid
    */
   constructor(str: string) {
@@ -91,7 +94,7 @@ export class Interval {
   }
 
   /**
-   * Calculates the number of half-steps of the interval
+   * Calculates the number of half-steps of the interval.
    * @returns a non-negative integer that is the number of half-steps counted
    */
   valueOf() {
@@ -117,25 +120,25 @@ export class Interval {
   }
 
   /**
-   * Converts the interval back to the string representation
+   * Converts the interval back to the string representation.
    */
   toString() {
     return this.quality + this.number;
   }
 
   /**
-   * Check if a generic interval is a perfect interval
+   * Check if a generic interval is a perfect interval.
    * @param number a non-negative integer
    * @returns true if it is, false otherwise
    */
-  // TOOD: check negative intervals
+  // TODO: check negative intervals
   private checkIsPerfectInterval(number: number) {
     const remainder = number % 7;
     return remainder === 1 || remainder === 4 || remainder === 5;
   }
 
   /**
-   * Check if the current interval is a perfect interval
+   * Check if the current interval is a perfect interval.
    * @returns true if it is, false otherwise
    */
   isPerfectInterval() {

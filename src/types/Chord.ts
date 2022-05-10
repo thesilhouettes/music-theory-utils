@@ -11,7 +11,7 @@ import { Note } from "./Note";
  */
 export class Chord {
   /**
-   * The root of a chord
+   * The root of a chord.
    */
   base: Note;
   /**
@@ -24,11 +24,11 @@ export class Chord {
   // below are some common chords
 
   /**
-   * Intervals for a major triad
+   * Intervals for a major triad.
    */
   static majorTriad = [new Interval("M3"), new Interval("m3")];
   /**
-   * Intervals for a major seventh
+   * Intervals for a major seventh.
    */
   static majorSeventh = [
     new Interval("M3"),
@@ -36,11 +36,11 @@ export class Chord {
     new Interval("M3"),
   ];
   /**
-   * Intervals for a minor triad
+   * Intervals for a minor triad.
    */
   static minorTriad = [new Interval("m3"), new Interval("M3")];
   /**
-   * Intervals for a minor seventh
+   * Intervals for a minor seventh.
    */
   static minorSeventh = [
     new Interval("m3"),
@@ -48,7 +48,7 @@ export class Chord {
     new Interval("m3"),
   ];
   /**
-   * Intervals for a dominant seventh
+   * Intervals for a dominant seventh.
    */
   static dominantSeventh = [
     new Interval("M3"),
@@ -56,11 +56,11 @@ export class Chord {
     new Interval("m3"),
   ];
   /**
-   * Intervals for a diminished triad
+   * Intervals for a diminished triad.
    */
   static diminishedTriad = [new Interval("m3"), new Interval("m3")];
   /**
-   * Intervals for a diminished seventh
+   * Intervals for a diminished seventh.
    */
   static diminishedSeventh = [
     new Interval("m3"),
@@ -68,7 +68,7 @@ export class Chord {
     new Interval("m3"),
   ];
   /**
-   * Intervals for a half diminished seventh
+   * Intervals for a half diminished seventh.
    */
   static halfDiminishedSeventh = [
     new Interval("m3"),
@@ -77,7 +77,7 @@ export class Chord {
   ];
 
   /**
-   * Constructs a chord from the root and the corresponding intervals
+   * Constructs a chord from the root and the corresponding intervals.
    * @param note the root
    * @param intervals the intervals which make up the chord, see the examples below.
    * @example
@@ -87,7 +87,7 @@ export class Chord {
    * ```
    * ```ts
    * new Chord(new Note("C", "b"), Chord.minorSeventh);
-   * // "Cb Eb Gb Bb"
+   * // "Cb Ebb Gb Bbb"
    * ```
    */
   constructor(note: Note, intervals: Interval[]) {
@@ -96,7 +96,7 @@ export class Chord {
   }
 
   /**
-   * Converts the chord to a string
+   * Converts the chord to a string.
    * @returns a space separated list of notes
    */
   toString() {
