@@ -86,6 +86,21 @@ export class Note {
   accidental: Accidental;
 
   /**
+   * The lowest note position in this library. It is in negative since I have
+   * chosen A0 as the zeroth position
+   */
+  static C0_POSITION = -9;
+
+  /**
+   * There are 88 keys in the piano, and the index starts from 0
+   */
+  static C8_POSITION = 87;
+
+  /**
+   * How many white keys and black keys are there in an octave
+   */
+  static POSITIONS_PER_OCTAVE = 12;
+  /**
    * Constructs an instance of `Note`
    *
    * @param pitch the note name without quality
@@ -103,30 +118,89 @@ export class Note {
    * @returns 0 to 11 if the note is relative, positive integer if the note is absolute
    */
   get value() {
-    const add =
+    const remainder =
       LetterValues.get(this.pitch)! + AccidentalValues.get(this.accidental)!;
+    // absolute case
+    if (this.octave !== null) {
+      const octaveBase =
+        Note.C0_POSITION + this.octave * Note.POSITIONS_PER_OCTAVE;
+      return octaveBase + remainder;
+    }
     // loop around if it is out of [0, 11]
-    if (add > 11) {
-      return add - 12;
-    } else if (add < 0) {
-      return add + 12;
+    if (remainder > 11) {
+      return remainder - 12;
+    } else if (remainder < 0) {
+      return remainder + 12;
     } else {
-      return add;
+      return remainder;
     }
   }
 
   /**
    * Calculate the number of half steps between the current note and an input
-   * note.
-   * @remarks currently only returns the absolute difference between the two notes
+   * note. The number is counted like this: the first note is exclusive, while the second note is inclusive.
+   * @example
+   * ```ts
+   * new Note("C").difference(new Note("A")) // 9
+   * ```
+   * @remarks may return negative values if the first note is lower than the second note, also applies for relative notes
    * @param rhs another note
-   * @returns a non-negative integer representing the number of half steps between two notes
+   * @returns an integer representing the number of half steps between two notes
    */
-  interval(rhs: Note) {
-    return Math.abs(this.value - rhs.value);
+  difference(rhs: Note) {
+    if (!Note.isAllTheSameType(this, rhs)) {
+      throw new Error("The notes are not the same type");
+    }
+    const diff = rhs.value - this.value;
+    // handle the relative case first
+    if (this.octave === null) {
+      if (diff < 0) {
+        return -(12 + diff);
+      }
+    }
+    return diff;
   }
 
-  // static fromAbsoluteNoteValue(absoluteValue: number, accidental: Accidental) {}
+  /**
+   * Returns a new note base on the position and accidental.
+   * @param absoluteValue the absolute position. Must be an integer between
+   * @link {Note.C0_POSITION} and @link {Note.C8_POSITION}
+   * @param accidental since there are enharmonic notes, an accidental should be
+   * provided to resolve the ambiguity
+   * @returns a new note
+   */
+  static fromAbsolutePosition(
+    absoluteValue: number,
+    accidental?: Accidental
+  ): Note {
+    if (absoluteValue < Note.C0_POSITION || absoluteValue > Note.C8_POSITION) {
+      throw new Error(
+        "the position is out of range. (Allowed region: C0 to C8)"
+      );
+    }
+    if (!Number.isInteger(absoluteValue)) {
+      throw new Error("value is not an integer");
+    }
+    const octave = Math.floor(
+      (absoluteValue - Note.C0_POSITION) / Note.POSITIONS_PER_OCTAVE
+    ) as Octave;
+    let remainder =
+      ((absoluteValue - Note.C0_POSITION) % Note.POSITIONS_PER_OCTAVE) -
+      AccidentalValues.get(accidental ?? "")!;
+    // sometimes remainder may go beyond 11 and 0, we need to loop around
+    if (remainder < 0) {
+      remainder += 12;
+    } else if (remainder > 11) {
+      remainder -= 12;
+    }
+    const letter = LetterValues.getRev(remainder);
+    if (!letter) {
+      throw new Error(
+        "a note with this accidental does not exist for this position"
+      );
+    }
+    return new Note(letter, accidental, octave);
+  }
 
   // static fromNoteValue(
   //   value: number,
@@ -149,12 +223,12 @@ export class Note {
     if (!notes.length) {
       return true;
     }
-    const first = notes[0].octave !== null;
+    const firstIsAbsolute = notes[0].octave !== null;
     for (const note of notes) {
-      if (first && note.octave === null) {
+      if (firstIsAbsolute && note.octave === null) {
         return false;
       }
-      if (!first && note.octave !== null) {
+      if (!firstIsAbsolute && note.octave !== null) {
         return false;
       }
     }
@@ -167,6 +241,7 @@ export class Note {
    * @param letter the base letter
    * @param degree how many steps to add, can be negative.
    * @returns a new letter
+   * @throws Error if degree is 0 or not integer
    *
    * @example
    * ```ts
@@ -174,16 +249,21 @@ export class Note {
    * ```
    */
   static addLetter(letter: Letter, degree: number) {
+    if (degree === 0 || !Number.isInteger(degree)) {
+      throw new Error("invalid degree");
+    }
     const index = DegreeValues.get(letter)!;
     if (degree > 1) {
       return DegreeValues.getRev((index + degree - 1) % 7)!;
-    } else if (degree < -1) {
+    } else if (degree == 1) {
+      return letter;
+    }
+    // degree < -1
+    else {
       const remainder = (index + degree) % 7;
       return DegreeValues.getRev(
         remainder > 0 ? remainder + 1 : remainder + 8
       )!;
-    } else {
-      return letter;
     }
   }
 
@@ -201,9 +281,14 @@ export class Note {
    */
   addInterval(interval: Interval) {
     const nextLetter = Note.addLetter(this.pitch, interval.number);
-
     // find which note fits
-    const nextInterval = (this.value + +interval) % 12;
+
+    let nextInterval;
+    if (this.octave !== null) {
+      nextInterval = (this.value - Note.C0_POSITION + +interval) % 12;
+    } else {
+      nextInterval = (this.value + +interval) % 12;
+    }
     const nextLetterValue = LetterValues.get(nextLetter)!;
     // now we only focus on simple intervals
     for (const accidental of ["", "#", "b", "x", "bb", "#x", "bbb"]) {
@@ -215,6 +300,13 @@ export class Note {
         withAccidental += 12;
       }
       if (withAccidental === nextInterval) {
+        if (this.octave !== null) {
+          const nextNotePosition = this.value + +interval;
+          return Note.fromAbsolutePosition(
+            nextNotePosition,
+            accidental as Accidental
+          );
+        }
         return new Note(nextLetter, accidental as Accidental);
       }
     }

@@ -21,7 +21,7 @@ describe("Chord", () => {
       expect(minorChord.toString()).toEqual("D F A");
       minorChord = new Chord(new Note("E", "b"), Chord.minorSeventh);
       expect(minorChord.toString()).toEqual("Eb Gb Bb Db");
-      // sounds like B major but wtesth style
+      // sounds like B major but with style
       minorChord = new Chord(new Note("C", "b"), Chord.minorSeventh);
       expect(minorChord.toString()).toEqual("Cb Ebb Gb Bbb");
     });
@@ -35,7 +35,7 @@ describe("Chord", () => {
       expect(dominantChord.toString()).toEqual("E G# B D");
     });
 
-    test("should work for fully diminshed chords", function () {
+    test("should work for fully diminished chords", function () {
       let diminishedChord = new Chord(
         new Note("F", "#"),
         Chord.diminishedSeventh
@@ -49,7 +49,7 @@ describe("Chord", () => {
       expect(diminishedChord.toString()).toEqual("Cb Ebb Gbb Bbbb");
     });
 
-    test("should work for half diminshed chords", function () {
+    test("should work for half diminished chords", function () {
       let halfDiminishedChord = new Chord(
         new Note("D", ""),
         Chord.halfDiminishedSeventh
@@ -70,6 +70,27 @@ describe("Chord", () => {
         Chord.halfDiminishedSeventh
       );
       expect(halfDiminishedChord.toString()).toEqual("D# F# A C#");
+    });
+
+    test("should work for absolute notes single octave", function () {
+      expect(
+        new Chord(new Note("C", "", 3), Chord.majorSeventh).toString()
+      ).toEqual("C3 E3 G3 B3");
+      expect(
+        new Chord(new Note("D", "b", 4), Chord.halfDiminishedSeventh).toString()
+      ).toEqual("Db4 Fb4 Abb4 Cb4");
+    });
+
+    test("should work for absolute notes across octaves", function () {
+      expect(
+        new Chord(new Note("F", "", 3), Chord.dominantSeventh).toString()
+      ).toEqual("F3 A3 C4 Eb4");
+      expect(
+        new Chord(new Note("A", "b", 4), Chord.majorSeventh).toString()
+      ).toEqual("Ab4 C5 Eb5 G5");
+      expect(
+        new Chord(new Note("B", "b", 1), Chord.diminishedSeventh).toString()
+      ).toEqual("Bb1 Db2 Fb2 Abb2");
     });
   });
 });
