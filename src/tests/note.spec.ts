@@ -169,6 +169,9 @@ describe("Note type", () => {
       expect(new Note("E", "b", 5).addInterval(new Interval("A6"))).toEqual(
         new Note("C", "#", 6)
       );
+      expect(new Note("G", "#", 2).addInterval(new Interval("M3"))).toEqual(
+        new Note("B", "#", 2)
+      );
     });
 
     test("absolute notes compound intervals", function () {
@@ -256,7 +259,7 @@ describe("Note type", () => {
       expect(Note.fromAbsolutePosition(10, "bb")).toEqual(
         new Note("A", "bb", 1)
       );
-      expect(Note.fromAbsolutePosition(16, "x")).toEqual(new Note("B", "x", 2));
+      expect(Note.fromAbsolutePosition(16, "x")).toEqual(new Note("B", "x", 1));
     });
 
     test("throw error is not possible", function () {
@@ -268,6 +271,110 @@ describe("Note type", () => {
       expect(() => Note.fromAbsolutePosition(12519350, "")).toThrow();
       expect(() => Note.fromAbsolutePosition(-12519350, "")).toThrow();
       expect(() => Note.fromAbsolutePosition(23.35, "")).toThrow();
+    });
+  });
+
+  describe("get intervals between", function () {
+    test("throw errors when notes are not the same type", function () {
+      expect(() =>
+        new Note("A").getIntervalBetween(new Note("B", "#", 3))
+      ).toThrow();
+    });
+
+    test("throw errors when there is no range suitable", function () {
+      expect(() =>
+        new Note("A", "bb", 2).getIntervalBetween(new Note("B", "x", 3))
+      ).toThrow();
+    });
+
+    test("relative intervals not perfect", function () {
+      expect(new Note("A").getIntervalBetween(new Note("F", "#"))).toEqual(
+        new Interval("M6")
+      );
+      expect(new Note("A").getIntervalBetween(new Note("F", ""))).toEqual(
+        new Interval("m6")
+      );
+      expect(new Note("E", "#").getIntervalBetween(new Note("G", ""))).toEqual(
+        new Interval("d3")
+      );
+      expect(new Note("E", "b").getIntervalBetween(new Note("G", "#"))).toEqual(
+        new Interval("A3")
+      );
+    });
+
+    test("relative intervals perfect", function () {
+      expect(new Note("B", "b").getIntervalBetween(new Note("F", "b"))).toEqual(
+        new Interval("d5")
+      );
+      expect(new Note("C", "").getIntervalBetween(new Note("G", ""))).toEqual(
+        new Interval("P5")
+      );
+      expect(new Note("D", "").getIntervalBetween(new Note("A", "#"))).toEqual(
+        new Interval("A5")
+      );
+    });
+
+    test("absolute intervals single octave not perfect", function () {
+      expect(
+        new Note("F", "#", 4).getIntervalBetween(new Note("E", "#", 5))
+      ).toEqual(new Interval("M7"));
+      expect(
+        new Note("A", "", 3).getIntervalBetween(new Note("F", "", 4))
+      ).toEqual(new Interval("m6"));
+      expect(
+        new Note("E", "#", 6).getIntervalBetween(new Note("G", "", 6))
+      ).toEqual(new Interval("d3"));
+      expect(
+        new Note("E", "b", 2).getIntervalBetween(new Note("G", "#", 2))
+      ).toEqual(new Interval("A3"));
+    });
+
+    test("absolute intervals single octave perfect", function () {
+      expect(
+        new Note("F", "#", 4).getIntervalBetween(new Note("C", "#", 5))
+      ).toEqual(new Interval("P5"));
+      expect(
+        new Note("A", "", 3).getIntervalBetween(new Note("D", "b", 4))
+      ).toEqual(new Interval("d4"));
+      expect(
+        new Note("E", "#", 6).getIntervalBetween(new Note("E", "#", 6))
+      ).toEqual(new Interval("P1"));
+      expect(
+        new Note("E", "b", 2).getIntervalBetween(new Note("A", "", 2))
+      ).toEqual(new Interval("A4"));
+      expect(
+        new Note("D", "x", 2).getIntervalBetween(new Note("D", "x", 3))
+      ).toEqual(new Interval("P8"));
+    });
+
+    test("absolute intervals more octaves not perfect", function () {
+      expect(
+        new Note("F", "#", 4).getIntervalBetween(new Note("G", "#", 6))
+      ).toEqual(new Interval("M16"));
+      expect(
+        new Note("A", "", 3).getIntervalBetween(new Note("F", "", 5))
+      ).toEqual(new Interval("m13"));
+      expect(
+        new Note("E", "#", 3).getIntervalBetween(new Note("G", "", 6))
+      ).toEqual(new Interval("d24"));
+      expect(
+        new Note("E", "b", 2).getIntervalBetween(new Note("G", "#", 5))
+      ).toEqual(new Interval("A24"));
+    });
+
+    test("absolute intervals more octaves not perfect", function () {
+      expect(
+        new Note("F", "#", 4).getIntervalBetween(new Note("B", "", 5))
+      ).toEqual(new Interval("P11"));
+      expect(
+        new Note("A", "b", 3).getIntervalBetween(new Note("E", "", 5))
+      ).toEqual(new Interval("A12"));
+      expect(
+        new Note("E", "b", 3).getIntervalBetween(new Note("A", "bb", 6))
+      ).toEqual(new Interval("d25"));
+      expect(
+        new Note("B", "", 2).getIntervalBetween(new Note("B", "", 5))
+      ).toEqual(new Interval("P22"));
     });
   });
 });

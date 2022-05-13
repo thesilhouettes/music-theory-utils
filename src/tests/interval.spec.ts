@@ -55,4 +55,25 @@ describe("intervals", () => {
       expect(new Interval("P18").valueOf()).toEqual(29);
     });
   });
+
+  describe("equals", () => {
+    test("should give true", function () {
+      const i1 = new Interval("m3");
+      const i2 = new Interval("m3");
+      expect(i1.equals(i2)).toBe(true);
+      const i3 = new Interval("P15");
+      const i4 = new Interval("P15");
+      expect(i3.equals(i4)).toBe(true);
+    });
+
+    test("should give false", function () {
+      const i1 = new Interval("m7");
+      const i2 = new Interval("P8");
+      expect(i1.equals(i2)).toBe(false);
+      // enharmonic intervals should still give false
+      const i3 = new Interval("P15");
+      const i4 = new Interval("d16");
+      expect(i3.equals(i4)).toBe(false);
+    });
+  });
 });

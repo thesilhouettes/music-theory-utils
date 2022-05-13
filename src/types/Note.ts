@@ -1,5 +1,9 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
-import { Interval } from "./Interval";
+import {
+  ImperfectQualityValue,
+  Interval,
+  PerfectQualityValue,
+} from "./Interval";
 
 /**
  * Represent how the key letters map to a position within an octave.
@@ -181,17 +185,19 @@ export class Note {
     if (!Number.isInteger(absoluteValue)) {
       throw new Error("value is not an integer");
     }
-    const octave = Math.floor(
+    let octave = Math.floor(
       (absoluteValue - Note.C0_POSITION) / Note.POSITIONS_PER_OCTAVE
-    ) as Octave;
+    ) as Exclude<Octave, null>;
     let remainder =
       ((absoluteValue - Note.C0_POSITION) % Note.POSITIONS_PER_OCTAVE) -
       AccidentalValues.get(accidental ?? "")!;
     // sometimes remainder may go beyond 11 and 0, we need to loop around
     if (remainder < 0) {
       remainder += 12;
+      octave -= 1;
     } else if (remainder > 11) {
       remainder -= 12;
+      octave += 1;
     }
     const letter = LetterValues.getRev(remainder);
     if (!letter) {
@@ -199,14 +205,8 @@ export class Note {
         "a note with this accidental does not exist for this position"
       );
     }
-    return new Note(letter, accidental, octave);
+    return new Note(letter, accidental, octave as Octave);
   }
-
-  // static fromNoteValue(
-  //   value: number,
-  //   accidental: Accidental,
-  //   octave?: number
-  // ) {}
 
   // static from(str: string) {
   //   // TODO: return a Note from the string representation
@@ -311,6 +311,61 @@ export class Note {
       }
     }
     throw new Error("No accidental matches this interval!");
+  }
+
+  /**
+   * Returns the interval between the current note and `rhs`
+   * @param rhs the note to be compared
+   * @remarks intervals cannot be negative now, users should decide which note should be `this` or `rhs`
+   * @returns an interval between the two notes
+   */
+  getIntervalBetween(rhs: Note): Interval {
+    if (!Note.isAllTheSameType(this, rhs)) {
+      throw new Error("Notes are not the same type!");
+    }
+    let relativeSize =
+      DegreeValues.get(rhs.pitch)! - DegreeValues.get(this.pitch)! + 1;
+    // sometimes this.pitch may be larger than rhs.pitch
+    if (relativeSize <= 0) {
+      relativeSize += 7;
+    }
+    let octaves = 0; // relative notes do not have octaves
+    if (this.octave !== null && rhs.octave !== null) {
+      octaves = Math.floor(
+        Math.abs(this.difference(rhs)) / Note.POSITIONS_PER_OCTAVE
+      );
+    }
+    // very messy logic
+    let size;
+    if (octaves < 1) {
+      size = relativeSize;
+    } else if (octaves === 1) {
+      size = 8 + relativeSize - 1;
+    } else {
+      size = 8 + (octaves - 1) * 7 + (relativeSize - 1);
+    }
+    const diff = Math.abs(this.difference(rhs));
+
+    // it currently guesses which accidental it should be... :(
+    if (!Interval.checkIsPerfectInterval(size)) {
+      for (const quality of ["M", "m", "A", "d"]) {
+        const value = new Interval(`${quality}${size}`);
+        if (diff === +value) {
+          return value;
+        }
+      }
+    } else {
+      for (const quality of ["P", "d", "A"]) {
+        const value = new Interval(`${quality}${size}`);
+        if (diff === +value) {
+          return value;
+        }
+      }
+    }
+
+    throw new Error(
+      `This perfect interval is too wide, no quality can match it. Use enharmonic intervals instead. (Hint: ${rhs.toString()}`
+    );
   }
 
   /**

@@ -1,5 +1,5 @@
 import { Interval } from "./Interval";
-import { Note } from "./Note";
+import { Note, Octave } from "./Note";
 
 /**
  * Represents a chord, which means notes are stacked together vertically. In
@@ -9,7 +9,7 @@ import { Note } from "./Note";
  * @see {@link Note} and {@link Interval} for details on the base note and interval
  *
  */
-export class Chord {
+export class Chord implements Iterable<Note> {
   /**
    * The root of a chord.
    */
@@ -92,7 +92,51 @@ export class Chord {
    */
   constructor(note: Note, intervals: Interval[]) {
     this.base = note;
+    if (intervals.length === 0) {
+      throw new Error("A chord must have at least two notes!");
+    }
     this.intervals = intervals;
+  }
+
+  /**
+   * An iterator will return the notes of the chord one by one
+   */
+  [Symbol.iterator](): Iterator<Note> {
+    // currentNote is always ONE NOTE ahead of lastNote
+    // each time the next method only returns the lastNote
+    // this makes sure the base notes will also be returned
+    let currentNote = this.base;
+    let lastNote = this.base;
+    let index = 0;
+    const intervals = this.intervals;
+    return {
+      next() {
+        // by this point we have exhausted all the intervals already
+        // so we return return the currentNote
+        if (index === intervals.length) {
+          // increase index still so the else if statement below can be reached
+          index++;
+          return {
+            value: currentNote,
+            done: false,
+          };
+        }
+        // end the iteration by this object
+        else if (index > intervals.length) {
+          return {
+            value: undefined,
+            done: true,
+          };
+        }
+        // see the comment above
+        lastNote = currentNote;
+        currentNote = lastNote.addInterval(intervals[index++]);
+        return {
+          value: lastNote,
+          done: false,
+        };
+      },
+    };
   }
 
   /**
@@ -100,12 +144,52 @@ export class Chord {
    * @returns a space separated list of notes
    */
   toString() {
-    let acc = this.base + " ";
-    let current = this.base;
-    for (const interval of this.intervals) {
-      current = current.addInterval(interval);
-      acc += current + " ";
+    let acc = "";
+    for (const note of this) {
+      acc += note + " ";
     }
     return acc.slice(0, -1);
+  }
+
+  /**
+   * Inverts a chord several times.
+   * @param times how many times to invert the chord.
+   * @returns the inverted chord, the original chord is not mutated.
+   */
+  invert(times: number) {
+    const notes = [...this];
+    for (let i = 0; i < times; i++) {
+      const note = notes.shift()!;
+      // example: C2 E2 G2 B2 -> E2 G2 B2 C3 so we should increase the octave of C
+      if (note.octave) {
+        const diff = notes[notes.length - 1].difference(note);
+        if (diff < 0) {
+          note.octave! += Math.ceil(-diff / Note.POSITIONS_PER_OCTAVE);
+        }
+        // console.log(note, notes[notes.length - 1], diff);
+      }
+      notes.push(note);
+    }
+    const intervals = [];
+    for (let i = 1; i < notes.length; i++) {
+      intervals.push(notes[i - 1].getIntervalBetween(notes[i]));
+    }
+    return new Chord(notes[0], intervals);
+  }
+
+  /**
+   * Determine if two chords are equal. The chords should have the same base
+   * note and intervals.
+   * @param rhs the chord to be compared
+   * @returns a boolean indicating the result
+   */
+  equals(rhs: Chord) {
+    if (!this.base.equals(rhs.base)) return false;
+    for (let i = 0; i < this.intervals.length; i++) {
+      if (!this.intervals[i].equals(rhs.intervals[i])) {
+        return false;
+      }
+    }
+    return true;
   }
 }

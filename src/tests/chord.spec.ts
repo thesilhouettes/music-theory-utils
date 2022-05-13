@@ -1,7 +1,14 @@
 import { Note } from "../types/Note";
 import { Chord } from "../types/Chord";
+import { Interval } from "../types/Interval";
 
 describe("Chord", () => {
+  describe("constructor", () => {
+    test("should throw error if there are no intervals", function () {
+      expect(() => new Chord(new Note("E"), [])).toThrow();
+    });
+  });
+
   describe("toString", () => {
     test("major triad and major seventh", function () {
       let majorChord = new Chord(new Note("C"), Chord.majorTriad);
@@ -78,7 +85,7 @@ describe("Chord", () => {
       ).toEqual("C3 E3 G3 B3");
       expect(
         new Chord(new Note("D", "b", 4), Chord.halfDiminishedSeventh).toString()
-      ).toEqual("Db4 Fb4 Abb4 Cb4");
+      ).toEqual("Db4 Fb4 Abb4 Cb5");
     });
 
     test("should work for absolute notes across octaves", function () {
@@ -91,6 +98,85 @@ describe("Chord", () => {
       expect(
         new Chord(new Note("B", "b", 1), Chord.diminishedSeventh).toString()
       ).toEqual("Bb1 Db2 Fb2 Abb2");
+    });
+  });
+
+  describe("equals", function () {
+    test("these chords should equal", function () {
+      const c1 = new Chord(new Note("E"), Chord.majorTriad);
+      const c2 = new Chord(new Note("E"), Chord.majorTriad);
+      expect(c1.equals(c2)).toBe(true);
+      const c3 = new Chord(new Note("F", "#", 3), Chord.minorSeventh);
+      const c4 = new Chord(new Note("F", "#", 3), Chord.minorSeventh);
+      expect(c3.equals(c4)).toBe(true);
+    });
+
+    test("these chords should not equal", function () {
+      const c1 = new Chord(new Note("G"), Chord.minorTriad);
+      const c2 = new Chord(new Note("G"), Chord.majorTriad);
+      expect(c1.equals(c2)).toBe(false);
+      // enharmonic still gives false
+      const c3 = new Chord(new Note("C", "#", 3), Chord.minorSeventh);
+      const c4 = new Chord(new Note("D", "b", 3), Chord.minorSeventh);
+      expect(c3.equals(c4)).toBe(false);
+    });
+  });
+
+  describe("inverting chords", function () {
+    test("should revert to original for generic notes", function () {
+      const chord1 = new Chord(new Note("C", "b"), Chord.majorSeventh);
+      expect(chord1.invert(4).equals(chord1)).toBe(true);
+      const chord2 = new Chord(new Note("G", "#"), [
+        ...Chord.majorSeventh,
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m3"),
+      ]);
+      expect(chord2.invert(7).equals(chord2)).toBe(true);
+    });
+
+    test("should have the correct intervals for generic notes", function () {
+      const chord1 = new Chord(new Note("C"), Chord.majorSeventh);
+      const chord2 = new Chord(new Note("E"), [
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m2"),
+      ]);
+      expect(chord1.invert(1).equals(chord2)).toBe(true);
+      const chord3 = new Chord(new Note("F", "#"), [
+        ...Chord.minorSeventh,
+        new Interval("M3"),
+        new Interval("m3"),
+        new Interval("M3"),
+      ]);
+      const chord4 = new Chord(new Note("C", "#"), [
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m3"),
+        new Interval("m3"),
+      ]);
+      expect(chord3.invert(2).equals(chord4)).toBe(true);
+    });
+
+    test("should raise one octave for absolute notes", function () {
+      const chord1 = new Chord(new Note("C", "b", 4), Chord.majorSeventh);
+      const chord2 = new Chord(new Note("C", "b", 5), Chord.majorSeventh);
+      expect(chord1.invert(4).equals(chord2)).toBe(true);
+      const chord3 = new Chord(new Note("G", "#", 1), [
+        ...Chord.majorSeventh,
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m3"),
+      ]);
+      const chord4 = new Chord(new Note("G", "#", 3), [
+        ...Chord.majorSeventh,
+        new Interval("m3"),
+        new Interval("M3"),
+        new Interval("m3"),
+      ]);
+      expect(chord3.invert(7).equals(chord4)).toBe(true);
     });
   });
 });
