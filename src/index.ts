@@ -11,4 +11,5 @@ export * from "./types/errorTypes";
 export * from "./types/Chord";
 export * from "./types/Interval";
 export * from "./types/Note";
+export * from "./types/Scale";
 export * from "./utils/TwoWayMap";
