@@ -211,9 +211,48 @@ export class Note {
     return new Note(letter, accidental, octave as Octave);
   }
 
-  // static from(str: string) {
-  //   // TODO: return a Note from the string representation
-  // }
+  /**
+   * Converts a string representation of note to a `Note`.
+   * @example
+   * ```ts
+   * Note.from("Cbb5") // { pitch: "C", accidental: "bb", octave: 5}
+   * Note.from("E4") // { pitch: "E", accidental: "", octave: 4 }
+   * Note.from("B9") // InvalidInputError
+   * ```
+   * @param str the string to be converted
+   * @returns a new instance of `Note`
+   * @throws InvalidInputError if either `pitch`, `accidental` or `octave` is invalid
+   */
+  static from(str: string) {
+    const matcher = /^([A-G])(#x|#|x|b+)?(\d)?$/;
+    const results = str.match(matcher);
+    if (!results) {
+      throw new InvalidInputError(
+        "str",
+        "The whole string representation is invalid"
+      );
+    }
+    const note = results[1];
+    const accidental = results[2] ?? "";
+    const octave = results[3];
+
+    if (AccidentalValues.get(accidental as Accidental) === undefined) {
+      throw new InvalidInputError(
+        "accidental",
+        "This is not a valid accidental"
+      );
+    }
+    const octaveAsNumber = Number.parseInt(octave);
+    if (octaveAsNumber && (octaveAsNumber < 0 || octaveAsNumber > 8)) {
+      throw new InvalidInputError("octave", "This is not a valid octave");
+    }
+
+    return new Note(
+      note as Letter,
+      accidental as Accidental,
+      octaveAsNumber as Octave
+    );
+  }
 
   /**
    * Checks if the input notes have the same "type" as the current note.

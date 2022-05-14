@@ -8,6 +8,41 @@ import { Interval } from "../types/Interval";
 import { Note } from "../types/Note";
 
 describe("Note type", () => {
+  describe("from", function () {
+    test("check without octaves", function () {
+      expect(Note.from("C#")).toEqual(new Note("C", "#"));
+      expect(Note.from("Cx")).toEqual(new Note("C", "x"));
+      expect(Note.from("Gbb")).toEqual(new Note("G", "bb"));
+      expect(Note.from("Abbb")).toEqual(new Note("A", "bbb"));
+      expect(Note.from("B#x")).toEqual(new Note("B", "#x"));
+      expect(Note.from("E")).toEqual(new Note("E", ""));
+    });
+
+    test("check with octaves", function () {
+      expect(Note.from("A0")).toEqual(new Note("A", "", 0));
+      expect(Note.from("Cx1")).toEqual(new Note("C", "x", 1));
+      expect(Note.from("Bbb4")).toEqual(new Note("B", "bb", 4));
+      expect(Note.from("Ebbb7")).toEqual(new Note("E", "bbb", 7));
+      expect(Note.from("F#x5")).toEqual(new Note("F", "#x", 5));
+      expect(Note.from("E3")).toEqual(new Note("E", "", 3));
+    });
+
+    test("invalid note names", function () {
+      expect(() => Note.from("H#x5")).toThrowError(InvalidInputError);
+      expect(() => Note.from("I3")).toThrowError(InvalidInputError);
+    });
+
+    test("invalid accidentals names", function () {
+      expect(() => Note.from("Abbbbb5")).toThrowError(InvalidInputError);
+      expect(() => Note.from("C#x##4")).toThrowError(InvalidInputError);
+    });
+
+    test("invalid octaves", function () {
+      expect(() => Note.from("Abb9")).toThrowError(InvalidInputError);
+      expect(() => Note.from("C-3")).toThrowError(InvalidInputError);
+    });
+  });
+
   describe("constructor and value", () => {
     test("works for normal circumstances", function () {
       expect(new Note("C", "#").value).toEqual(1);
