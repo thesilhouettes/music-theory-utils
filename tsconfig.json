@@ -5,9 +5,10 @@
     "lib": ["dom", "es6", "es2017", "esnext.asynciterable"],
     "skipLibCheck": true,
     "sourceMap": true,
+    "declaration": true,
     "outDir": "./dist",
     "moduleResolution": "node",
-    "removeComments": true,
+    "removeComments": false,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -23,6 +24,6 @@
     "resolveJsonModule": true,
     "baseUrl": "."
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "./src/tests/**/*"],
   "include": ["./src/**/*.ts"]
 }

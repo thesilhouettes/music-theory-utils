@@ -1,8 +1,21 @@
 {
   "name": "music-theory-utils",
   "version": "1.0.0",
-  "description": "Calculates intervals, chords, times and so on.",
+  "description": "Calculates intervals, chords, intervals, scales and so on.",
   "main": "dist/index.js",
+  "private": false,
+  "homepage": "https://github.com/thesilhouettes/music-theory-utils",
+  "repository": {
+    "directory": "https://github.com/thesilhouettes/music-theory-utils.git",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/thesilhouettes/music-theory-utils/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "watch:ts": "tsc --watch",
     "build:ts": "tsc",
@@ -25,7 +38,6 @@
     ]
   },
   "author": "TheSilhouette",
-  "license": "ISC",
   "devDependencies": {
     "@commitlint/cli": "^16.2.4",
     "@commitlint/config-conventional": "^16.2.4",
