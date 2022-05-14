@@ -1,26 +1,27 @@
+import { InvalidInputError } from "../types/errorTypes";
 import { Interval } from "../types/Interval";
 
 describe("intervals", () => {
   describe("constructor", () => {
     test("split the interval correctly", function () {
       const interval = new Interval("A3");
-      expect(interval.number).toEqual(3);
+      expect(interval.size).toEqual(3);
       expect(interval.quality).toEqual("A");
     });
 
     test("throws an error for splitting errors", function () {
       expect(function () {
         new Interval("");
-      }).toThrow();
+      }).toThrowError(InvalidInputError);
       expect(function () {
         new Interval("P7");
-      }).toThrow();
+      }).toThrowError(InvalidInputError);
       expect(function () {
         new Interval("m4");
-      }).toThrow();
+      }).toThrowError(InvalidInputError);
       expect(function () {
         new Interval("C4");
-      }).toThrow();
+      }).toThrowError(InvalidInputError);
     });
   });
 

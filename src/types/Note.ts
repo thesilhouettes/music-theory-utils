@@ -1,9 +1,11 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
 import {
-  ImperfectQualityValue,
-  Interval,
-  PerfectQualityValue,
-} from "./Interval";
+  ImpossibleQualityError,
+  InvalidInputError,
+  NotSameTypeError,
+  OutOfRegionError,
+} from "./errorTypes";
+import { Interval } from "./Interval";
 
 /**
  * Represent how the key letters map to a position within an octave.
@@ -150,10 +152,11 @@ export class Note {
    * @remarks may return negative values if the first note is lower than the second note, also applies for relative notes
    * @param rhs another note
    * @returns an integer representing the number of half steps between two notes
+   * @throws NotSameTypeError if the input notes do not have the same type
    */
   difference(rhs: Note) {
     if (!Note.isAllTheSameType(this, rhs)) {
-      throw new Error("The notes are not the same type");
+      throw new NotSameTypeError();
     }
     const diff = rhs.value - this.value;
     // handle the relative case first
@@ -172,18 +175,18 @@ export class Note {
    * @param accidental since there are enharmonic notes, an accidental should be
    * provided to resolve the ambiguity
    * @returns a new note
+   * @throws OutOfRegionError if number is out of C0 or C8, or InvalidInputError
+   * if number is not an integer
    */
   static fromAbsolutePosition(
     absoluteValue: number,
     accidental?: Accidental
   ): Note {
-    if (absoluteValue < Note.C0_POSITION || absoluteValue > Note.C8_POSITION) {
-      throw new Error(
-        "the position is out of range. (Allowed region: C0 to C8)"
-      );
-    }
     if (!Number.isInteger(absoluteValue)) {
-      throw new Error("value is not an integer");
+      throw new InvalidInputError("value", "It is not an integer");
+    }
+    if (absoluteValue < Note.C0_POSITION || absoluteValue > Note.C8_POSITION) {
+      throw new OutOfRegionError(absoluteValue);
     }
     let octave = Math.floor(
       (absoluteValue - Note.C0_POSITION) / Note.POSITIONS_PER_OCTAVE
@@ -201,7 +204,7 @@ export class Note {
     }
     const letter = LetterValues.getRev(remainder);
     if (!letter) {
-      throw new Error(
+      throw new ImpossibleQualityError(
         "a note with this accidental does not exist for this position"
       );
     }
@@ -241,7 +244,7 @@ export class Note {
    * @param letter the base letter
    * @param degree how many steps to add, can be negative.
    * @returns a new letter
-   * @throws Error if degree is 0 or not integer
+   * @throws InvalidInputError if degree is 0 or not integer
    *
    * @example
    * ```ts
@@ -250,7 +253,7 @@ export class Note {
    */
   static addLetter(letter: Letter, degree: number) {
     if (degree === 0 || !Number.isInteger(degree)) {
-      throw new Error("invalid degree");
+      throw new InvalidInputError("degree", "Degree is invalid");
     }
     const index = DegreeValues.get(letter)!;
     if (degree > 1) {
@@ -271,7 +274,8 @@ export class Note {
    * Add an interval to the current note.
    * @param interval the interval to be added
    * @returns a new note after adding
-   *
+   * @throws ImpossibleQualityError if the interval requires notation more than
+   * triple flats and triple sharps
    * @example
    * ```ts
    * new Note("C", "#")
@@ -280,9 +284,9 @@ export class Note {
    * ```
    */
   addInterval(interval: Interval) {
-    const nextLetter = Note.addLetter(this.pitch, interval.number);
-    // find which note fits
+    const nextLetter = Note.addLetter(this.pitch, interval.size);
 
+    // find which note fits
     let nextInterval;
     if (this.octave !== null) {
       nextInterval = (this.value - Note.C0_POSITION + +interval) % 12;
@@ -310,7 +314,7 @@ export class Note {
         return new Note(nextLetter, accidental as Accidental);
       }
     }
-    throw new Error("No accidental matches this interval!");
+    throw new ImpossibleQualityError("No accidental matches this interval!");
   }
 
   /**
@@ -318,10 +322,11 @@ export class Note {
    * @param rhs the note to be compared
    * @remarks intervals cannot be negative now, users should decide which note should be `this` or `rhs`
    * @returns an interval between the two notes
+   * @throws NotSameTypeError if the input notes do not have the same type
    */
   getIntervalBetween(rhs: Note): Interval {
     if (!Note.isAllTheSameType(this, rhs)) {
-      throw new Error("Notes are not the same type!");
+      throw new NotSameTypeError();
     }
     let relativeSize =
       DegreeValues.get(rhs.pitch)! - DegreeValues.get(this.pitch)! + 1;
@@ -363,7 +368,7 @@ export class Note {
       }
     }
 
-    throw new Error(
+    throw new ImpossibleQualityError(
       `This perfect interval is too wide, no quality can match it. Use enharmonic intervals instead. (Hint: ${rhs.toString()}`
     );
   }

@@ -1,5 +1,6 @@
 import { Interval } from "./Interval";
-import { Note, Octave } from "./Note";
+import { InvalidInputError } from "./errorTypes";
+import { Note } from "./Note";
 
 /**
  * Represents a chord, which means notes are stacked together vertically. In
@@ -93,7 +94,10 @@ export class Chord implements Iterable<Note> {
   constructor(note: Note, intervals: Interval[]) {
     this.base = note;
     if (intervals.length === 0) {
-      throw new Error("A chord must have at least two notes!");
+      throw new InvalidInputError(
+        "intervals",
+        "A chord must have at least two notes!"
+      );
     }
     this.intervals = intervals;
   }
@@ -166,7 +170,6 @@ export class Chord implements Iterable<Note> {
         if (diff < 0) {
           note.octave! += Math.ceil(-diff / Note.POSITIONS_PER_OCTAVE);
         }
-        // console.log(note, notes[notes.length - 1], diff);
       }
       notes.push(note);
     }

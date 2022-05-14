@@ -1,4 +1,5 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
+import { InvalidInputError } from "./errorTypes";
 
 type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -61,7 +62,7 @@ export class Interval {
   /**
    * The generic interval.
    */
-  public number: number;
+  public size: number;
 
   /**
    * Construct an interval from a string.
@@ -72,25 +73,31 @@ export class Interval {
    * @throws Error if the string is invalid
    */
   constructor(str: string) {
-    const [quality, number] = [str[0], str.slice(1)];
-    if (!quality || isNaN(parseInt(number))) {
-      throw new Error("The interval string is invalid");
+    const [quality, size] = [str[0], str.slice(1)];
+    if (!quality || isNaN(parseInt(size))) {
+      throw new InvalidInputError("size", "size is not a non-negative integer");
     }
     // verify if the string makes sense
-    if (Interval.checkIsPerfectInterval(+number)) {
+    if (Interval.checkIsPerfectInterval(+size)) {
       if (PerfectQualityValue.get(quality as PerfectQuality) === undefined) {
-        throw new Error("This quality does not exist in a perfect interval");
+        throw new InvalidInputError(
+          "quality",
+          `quality "${quality}" does not exist in a perfect interval`
+        );
       }
     } else {
       if (
         ImperfectQualityValue.get(quality as ImperfectQuality) === undefined
       ) {
-        throw new Error("This quality does not exist in an imperfect interval");
+        throw new InvalidInputError(
+          "quality",
+          `quality "${quality}" does not exist in a imperfect interval`
+        );
       }
     }
 
     this.quality = quality as PerfectQuality | ImperfectQuality;
-    this.number = +number;
+    this.size = +size;
   }
 
   /**
@@ -99,7 +106,7 @@ export class Interval {
    */
   valueOf() {
     let octaves;
-    const remainingSize = this.number - 8; // first octave
+    const remainingSize = this.size - 8; // first octave
     if (remainingSize === 0) {
       octaves = 1;
     } else if (remainingSize < 0) {
@@ -108,7 +115,7 @@ export class Interval {
       octaves = 1 + Math.floor(remainingSize / 7);
     }
     const simpleDegree = IntervalValues.get(
-      ((this.number + octaves) % 8) as SimpleInterval
+      ((this.size + octaves) % 8) as SimpleInterval
     ) as number;
     const octaveInterval = octaves * 12;
 
@@ -131,7 +138,7 @@ export class Interval {
    * Converts the interval back to the string representation.
    */
   toString() {
-    return this.quality + this.number;
+    return this.quality + this.size;
   }
 
   /**
@@ -150,7 +157,7 @@ export class Interval {
    * @returns true if it is, false otherwise
    */
   isPerfectInterval() {
-    return Interval.checkIsPerfectInterval(this.number);
+    return Interval.checkIsPerfectInterval(this.size);
   }
 
   /**
@@ -159,6 +166,6 @@ export class Interval {
    * @returns a boolean indicating the result
    */
   equals(rhs: Interval) {
-    return this.number === rhs.number && this.quality === rhs.quality;
+    return this.size === rhs.size && this.quality === rhs.quality;
   }
 }

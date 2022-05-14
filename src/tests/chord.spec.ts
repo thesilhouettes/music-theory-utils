@@ -1,11 +1,14 @@
 import { Note } from "../types/Note";
 import { Chord } from "../types/Chord";
 import { Interval } from "../types/Interval";
+import { InvalidInputError } from "../types/errorTypes";
 
 describe("Chord", () => {
   describe("constructor", () => {
     test("should throw error if there are no intervals", function () {
-      expect(() => new Chord(new Note("E"), [])).toThrow();
+      expect(() => new Chord(new Note("E"), [])).toThrowError(
+        InvalidInputError
+      );
     });
   });
 

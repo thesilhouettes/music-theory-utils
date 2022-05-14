@@ -1,3 +1,9 @@
+import {
+  ImpossibleQualityError,
+  InvalidInputError,
+  NotSameTypeError,
+  OutOfRegionError,
+} from "../types/errorTypes";
 import { Interval } from "../types/Interval";
 import { Note } from "../types/Note";
 
@@ -94,8 +100,8 @@ describe("Note type", () => {
     });
 
     test("should throw error for 0 and non-integers", () => {
-      expect(() => Note.addLetter("B", 0)).toThrow();
-      expect(() => Note.addLetter("B", -1.2)).toThrow();
+      expect(() => Note.addLetter("B", 0)).toThrowError(InvalidInputError);
+      expect(() => Note.addLetter("B", -1.2)).toThrowError(InvalidInputError);
     });
   });
 
@@ -193,7 +199,7 @@ describe("Note type", () => {
       // not practical
       expect(() =>
         new Note("B", "bbb").addInterval(new Interval("d2"))
-      ).toThrow();
+      ).toThrowError(ImpossibleQualityError);
     });
   });
 
@@ -235,10 +241,10 @@ describe("Note type", () => {
     test("two notes of different types should throw error", function () {
       expect(() =>
         new Note("D", "#", 4).difference(new Note("F", "#"))
-      ).toThrow();
+      ).toThrowError(NotSameTypeError);
       expect(() =>
         new Note("C", "b").difference(new Note("A", "bb", 5))
-      ).toThrow();
+      ).toThrowError(NotSameTypeError);
     });
   });
 
@@ -263,14 +269,24 @@ describe("Note type", () => {
     });
 
     test("throw error is not possible", function () {
-      expect(() => Note.fromAbsolutePosition(1, "")).toThrow();
-      expect(() => Note.fromAbsolutePosition(53, "b")).toThrow();
+      expect(() => Note.fromAbsolutePosition(1, "")).toThrowError(
+        ImpossibleQualityError
+      );
+      expect(() => Note.fromAbsolutePosition(53, "b")).toThrowError(
+        ImpossibleQualityError
+      );
     });
 
     test("throw error is out of range", function () {
-      expect(() => Note.fromAbsolutePosition(12519350, "")).toThrow();
-      expect(() => Note.fromAbsolutePosition(-12519350, "")).toThrow();
-      expect(() => Note.fromAbsolutePosition(23.35, "")).toThrow();
+      expect(() => Note.fromAbsolutePosition(12519350, "")).toThrowError(
+        OutOfRegionError
+      );
+      expect(() => Note.fromAbsolutePosition(-12519350, "")).toThrowError(
+        OutOfRegionError
+      );
+      expect(() => Note.fromAbsolutePosition(23.35, "")).toThrowError(
+        InvalidInputError
+      );
     });
   });
 
@@ -278,13 +294,13 @@ describe("Note type", () => {
     test("throw errors when notes are not the same type", function () {
       expect(() =>
         new Note("A").getIntervalBetween(new Note("B", "#", 3))
-      ).toThrow();
+      ).toThrowError(NotSameTypeError);
     });
 
     test("throw errors when there is no range suitable", function () {
       expect(() =>
         new Note("A", "bb", 2).getIntervalBetween(new Note("B", "x", 3))
-      ).toThrow();
+      ).toThrowError(ImpossibleQualityError);
     });
 
     test("relative intervals not perfect", function () {

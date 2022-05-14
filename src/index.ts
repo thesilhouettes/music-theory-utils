@@ -7,6 +7,7 @@
  */
 
 // re-exports
+export * from "./types/errorTypes";
 export * from "./types/Chord";
 export * from "./types/Interval";
 export * from "./types/Note";
