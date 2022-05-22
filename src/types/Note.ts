@@ -419,15 +419,22 @@ export class Note {
    *  - the same pitch
    *  - the same octave (or same type)
    *  - the same quality
+   *  if `enharmonicallyEquivalent` is not set to true.
+   *  If `enharmonicallyEquivalent` is set to true, then two notes are considered true if they sound the same (that is, the position of them is identical)
    * @param rhs another note to compare
+   * @param enharmonicallyEquivalent return the same if the two notes sound the same
    * @returns true if they are equal, false otherwise
    */
-  equals(rhs: Note) {
-    return (
-      this.pitch === rhs.pitch &&
-      this.octave === rhs.octave &&
-      this.accidental === rhs.accidental
-    );
+  equals(rhs: Note, enharmonicallyEquivalent = false) {
+    if (enharmonicallyEquivalent) {
+      return this.value === rhs.value;
+    } else {
+      return (
+        this.pitch === rhs.pitch &&
+        this.octave === rhs.octave &&
+        this.accidental === rhs.accidental
+      );
+    }
   }
 
   /**

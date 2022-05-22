@@ -123,6 +123,37 @@ describe("Chord", () => {
       const c4 = new Chord(new Note("D", "b", 3), Chord.minorSeventh);
       expect(c3.equals(c4)).toBe(false);
     });
+
+    test("enharmonic chords", function () {
+      // const c1 = new Chord(new Note("F", "#"), Chord.minorSeventh);
+      // const c2 = new Chord(new Note("G", "b"), Chord.minorSeventh);
+      // expect(c1.equals(c2, { enharmonicallyEquivalent: true })).toBe(true);
+      const c3 = new Chord(new Note("C", "b", 5), Chord.dominantSeventh);
+      const c4 = new Chord(new Note("B", "", 4), Chord.dominantSeventh);
+      expect(c3.equals(c4, { enharmonicallyEquivalent: true })).toBe(true);
+    });
+
+    test("ignore inversion", function () {
+      const c1 = new Chord(new Note("F", "#"), Chord.minorSeventh);
+      const c2 = c1.invert(1);
+      expect(c1.equals(c2, { ignoreInversion: true })).toBe(true);
+      const c3 = new Chord(new Note("C", "b", 5), Chord.dominantSeventh);
+      const c4 = c3.invert(3);
+      expect(c3.equals(c4, { ignoreInversion: true })).toBe(true);
+    });
+
+    test("enharmonic chords + ignore inversion", function () {
+      const c1 = new Chord(new Note("F", "#"), Chord.minorSeventh);
+      const c2 = new Chord(new Note("G", "b"), Chord.minorSeventh);
+      expect(
+        c1.equals(c2, { enharmonicallyEquivalent: true, ignoreInversion: true })
+      ).toBe(true);
+      const c3 = new Chord(new Note("C", "b", 5), Chord.dominantSeventh);
+      const c4 = new Chord(new Note("B", "", 4), Chord.dominantSeventh);
+      expect(
+        c3.equals(c4, { enharmonicallyEquivalent: true, ignoreInversion: true })
+      ).toBe(true);
+    });
   });
 
   describe("inverting chords", function () {

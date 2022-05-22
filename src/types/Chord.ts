@@ -3,6 +3,20 @@ import { InvalidInputError } from "./errorTypes";
 import { Note } from "./Note";
 
 /**
+ * This encapsulates the options of Chord `equals`.
+ */
+export interface EqualOptions {
+  /**
+   *  A chord is considered equal if they sound the same
+   */
+  enharmonicallyEquivalent?: boolean;
+  /**
+   * A chord is considered equal if they have the same notes
+   */
+  ignoreInversion?: boolean;
+}
+
+/**
  * Represents a chord, which means notes are stacked together vertically. In
  * `music-theory-utils`, a chord is represented by a base note, and the
  * intervals.
@@ -184,15 +198,53 @@ export class Chord implements Iterable<Note> {
    * Determine if two chords are equal. The chords should have the same base
    * note and intervals.
    * @param rhs the chord to be compared
+   * @param equalOptions modify the behaviour of the equal function
    * @returns a boolean indicating the result
    */
-  equals(rhs: Chord) {
-    if (!this.base.equals(rhs.base)) return false;
-    for (let i = 0; i < this.intervals.length; i++) {
-      if (!this.intervals[i].equals(rhs.intervals[i])) {
+  equals(
+    rhs: Chord,
+    { enharmonicallyEquivalent: h, ignoreInversion: i }: EqualOptions = {
+      enharmonicallyEquivalent: false,
+      ignoreInversion: false,
+    }
+  ) {
+    function generateKey(note: Note) {
+      return h ? note.value : note.toString();
+    }
+
+    if (!i) {
+      if (!this.base.equals(rhs.base, h)) return false;
+      for (let i = 0; i < this.intervals.length; i++) {
+        if (!this.intervals[i].equals(rhs.intervals[i], h)) {
+          return false;
+        }
+      }
+      return true;
+    } else {
+      const thisChord = [...this].map((note) => {
+        note.octave = null;
+        return note;
+      });
+      const rhsChord = [...rhs].map((note) => {
+        note.octave = null;
+        return note;
+      });
+      const map = new Map();
+      thisChord.forEach((note) => map.set(generateKey(note), false));
+      const allFine = rhsChord.every((note) => {
+        const key = generateKey(note);
+        if (map.has(key)) {
+          map.set(key, true);
+          return true;
+        } else {
+          return false;
+        }
+      });
+      if (!allFine) {
         return false;
+      } else {
+        return [...map.entries()].every(([_, val]) => val);
       }
     }
-    return true;
   }
 }

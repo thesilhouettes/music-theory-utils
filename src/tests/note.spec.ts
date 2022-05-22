@@ -428,4 +428,11 @@ describe("Note type", () => {
       ).toEqual(new Interval("P22"));
     });
   });
+
+  describe("enharmonic equal", function () {
+    expect(new Note("A", "", 3).equals(new Note("B", "bb", 3), true)).toBe(
+      true
+    );
+    expect(new Note("A", "").equals(new Note("B", "bb"), true)).toBe(true);
+  });
 });

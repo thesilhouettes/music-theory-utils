@@ -161,11 +161,16 @@ export class Interval {
   }
 
   /**
-   * Check if two intervals are the same. Both the size and quality shall be the same for it to return true
+   * Check if two intervals are the same. Both the size and quality shall be the same for it to return true. If `enharmonicallyEquivalent` is set, then they equal each other if the number of semitones are the same. See the description below.
    * @param rhs the interval to be compared
+   * @param enharmonicallyEquivalent return true if two intervals span the same number of semitones
    * @returns a boolean indicating the result
    */
-  equals(rhs: Interval) {
-    return this.size === rhs.size && this.quality === rhs.quality;
+  equals(rhs: Interval, enharmonicallyEquivalent = false) {
+    if (enharmonicallyEquivalent) {
+      return this.valueOf() === rhs.valueOf();
+    } else {
+      return this.size === rhs.size && this.quality === rhs.quality;
+    }
   }
 }

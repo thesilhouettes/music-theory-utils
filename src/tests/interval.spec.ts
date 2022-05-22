@@ -76,5 +76,14 @@ describe("intervals", () => {
       const i4 = new Interval("d16");
       expect(i3.equals(i4)).toBe(false);
     });
+
+    test("enharmonic intervals", function () {
+      const i1 = new Interval("M2");
+      const i2 = new Interval("d3");
+      expect(i1.equals(i2, true)).toBe(true);
+      const i3 = new Interval("P8");
+      const i4 = new Interval("A7");
+      expect(i3.equals(i4, true)).toBe(true);
+    });
   });
 });
