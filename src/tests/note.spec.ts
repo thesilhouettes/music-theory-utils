@@ -5,7 +5,7 @@ import {
   OutOfRegionError,
 } from "../types/errorTypes";
 import { Interval } from "../types/Interval";
-import { Note } from "../types/Note";
+import { alternativeAccidental, Note } from "../types/Note";
 
 describe("Note type", () => {
   describe("from", function () {
@@ -434,5 +434,17 @@ describe("Note type", () => {
       true
     );
     expect(new Note("A", "").equals(new Note("B", "bb"), true)).toBe(true);
+  });
+
+  describe("switch accidentals", function () {
+    test("change double sharps and natruals", function () {
+      expect(alternativeAccidental("x")).toEqual("##");
+      expect(alternativeAccidental("")).toEqual("n");
+    });
+
+    test("retain accidentals that is not listed", function () {
+      expect(alternativeAccidental("#")).toEqual("#");
+      expect(alternativeAccidental("b")).toEqual("b");
+    });
   });
 });

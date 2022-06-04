@@ -27,6 +27,11 @@ export const LetterValues = new TwoWayMap<Letter, number>({
 export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 /**
+ * All values of @link {Letter} packed into an array
+ */
+export const LettersArray: Letter[] = ["C", "D", "E", "F", "G", "A", "B"];
+
+/**
  * Represents a simple mapping between letter names to a number
  * Also a zero-indexed C major scale degrees.
  */
@@ -65,6 +70,45 @@ export const AccidentalValues = new TwoWayMap<Accidental, number>({
  * Represents the available accidental names.
  */
 export type Accidental = "b" | "bb" | "bbb" | "#" | "x" | "#x" | "";
+
+/**
+ * All values of accidentals packed into an array
+ */
+export const AccidentalsArray: Accidental[] = [
+  "b",
+  "bb",
+  "bbb",
+  "#",
+  "x",
+  "#x",
+  "",
+];
+
+export const ACCIDENTAL_NAMES = new TwoWayMap<Accidental, string>({
+  "#": "sharp",
+  "": "natural",
+  x: "double sharp",
+  "#x": "triple sharp",
+  b: "flat",
+  bb: "double flat",
+  bbb: "triple flat",
+});
+
+/**
+ * This function will change `x` (double sharp) into `##` and `` (natural) into `n`s. If the accidental is not one of them then it is returned unchanged
+ * @param accidental the accidental you want to change
+ * @returns An alternative representation
+ */
+export function alternativeAccidental(accidental: Accidental) {
+  switch (accidental) {
+    case "x":
+      return "##";
+    case "":
+      return "n";
+    default:
+      return accidental;
+  }
+}
 
 /**
  * Represents the available octave numbers, and `null` if the note is relative.

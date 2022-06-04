@@ -16,7 +16,7 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "prettier"],
   rules: {
-    indent: ["error", 2],
+    indent: ["error", 2, { SwitchCase: 1 }],
     quotes: ["error", "double"],
     semi: ["error", "always"],
     "space-function-before-paren": ["off"],

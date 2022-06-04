@@ -1,3 +1,4 @@
+import { TwoWayMap } from "../utils/TwoWayMap";
 import { InvalidInputError } from "./errorTypes";
 import { Interval } from "./Interval";
 import { Note } from "./Note";
@@ -110,6 +111,19 @@ export class Scale implements Iterable<Note> {
     Scale.WS,
     Scale.WS,
   ];
+
+  /**
+   * Names of scale degrees
+   */
+  static DEGREE_NAMES = new TwoWayMap({
+    1: "tonic",
+    2: "supertonic",
+    3: "mediant",
+    4: "subdominant",
+    5: "dominant",
+    6: "submediant",
+    7: "leading tone",
+  });
 
   /**
    * Constructs a root from the root and the corresponding intervals.

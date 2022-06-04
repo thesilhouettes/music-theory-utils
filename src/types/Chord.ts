@@ -1,5 +1,5 @@
-import { Interval } from "./Interval";
 import { InvalidInputError } from "./errorTypes";
+import { Interval } from "./Interval";
 import { Note } from "./Note";
 
 /**
@@ -90,6 +90,42 @@ export class Chord implements Iterable<Note> {
     new Interval("m3"),
     new Interval("M3"),
   ];
+
+  /* Short Names */
+
+  static maj = Chord.majorTriad;
+  static min = Chord.minorTriad;
+  static dim = Chord.diminishedTriad;
+  static maj7 = Chord.majorSeventh;
+  static min7 = Chord.minorSeventh;
+  static dom7 = Chord.dominantSeventh;
+  static dim7 = Chord.diminishedSeventh;
+  static half7 = Chord.halfDiminishedSeventh;
+
+  /**
+   * A map of common chord names
+   */
+  static COMMON_CHORDS_LONG_NAMES = {
+    "major triad": [Chord.maj],
+    "minor triad": [Chord.min],
+    "diminished triad": [Chord.dim],
+    "major seventh": [Chord.maj7],
+    "minor seventh": [Chord.min7],
+    "dominant seventh": [Chord.dom7],
+    "diminished seventh": [Chord.dim7],
+    "half-diminished seventh": [Chord.half7],
+  };
+
+  static COMMON_CHORDS_SHORT_NAMES = {
+    maj: [Chord.maj],
+    min: [Chord.min],
+    dim: [Chord.dim],
+    maj7: [Chord.maj7],
+    min7: [Chord.min7],
+    dom7: [Chord.dom7],
+    dim7: [Chord.dim7],
+    half7: [Chord.half7],
+  };
 
   /**
    * Constructs a chord from the root and the corresponding intervals.

@@ -6,7 +6,7 @@ type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 /**
  * Scale degrees to half-steps.
  */
-const IntervalValues = new TwoWayMap<SimpleInterval, number>({
+export const IntervalValues = new TwoWayMap<SimpleInterval, number>({
   1: 0,
   2: 2,
   3: 4,
@@ -31,6 +31,8 @@ export const PerfectQualityValue = new TwoWayMap({
  */
 export type PerfectQuality = "P" | "A" | "d";
 
+export const PerfectQualitiesArray: PerfectQuality[] = ["P", "A", "d"];
+
 /**
  * Mapping between imperfect qualities and its value.
  * For example, a minor interval lowers the note down by one, so the value is
@@ -48,6 +50,11 @@ export const ImperfectQualityValue = new TwoWayMap({
  * (d).
  */
 export type ImperfectQuality = "d" | "m" | "M" | "A";
+
+/**
+ * An array containing all the values of type @link {ImperfectQuality}
+ */
+export const ImperfectQualitiesArray: ImperfectQuality[] = ["d", "m", "M", "A"];
 
 /**
  * Represents an interval, without storing the notes on the two ends.
