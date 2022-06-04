@@ -9,7 +9,7 @@ type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 /**
  * Scale degrees to half-steps.
  */
-export const INTERVAL_VALUES = new TwoWayMap<SimpleInterval, number>({
+export const INTERVAL_VALUES = new TwoWayMap({
   1: 0,
   2: 2,
   3: 4,
@@ -94,16 +94,14 @@ export class Interval {
     }
     // verify if the string makes sense
     if (Interval.checkIsPerfectInterval(+size)) {
-      if (PERFECT_QUALITY_VALUE.get(quality as PerfectQuality) === undefined) {
+      if (PERFECT_QUALITY_VALUE.get(quality) === undefined) {
         throw new InvalidInputError(
           "quality",
           `quality "${quality}" does not exist in a perfect interval`
         );
       }
     } else {
-      if (
-        IMPERFECT_QUALITY_VALUE.get(quality as ImperfectQuality) === undefined
-      ) {
+      if (IMPERFECT_QUALITY_VALUE.get(quality) === undefined) {
         throw new InvalidInputError(
           "quality",
           `quality "${quality}" does not exist in a imperfect interval`
@@ -130,21 +128,19 @@ export class Interval {
       octaves = 1 + Math.floor(remainingSize / 7);
     }
     const simpleDegree = INTERVAL_VALUES.get(
-      ((this.size + octaves) % 8) as SimpleInterval
+      (this.size + octaves) % 8
     ) as number;
     const octaveInterval = octaves * 12;
 
     if (this.isPerfectInterval()) {
       return (
-        octaveInterval +
-        simpleDegree +
-        PERFECT_QUALITY_VALUE.get(this.quality as PerfectQuality)!
+        octaveInterval + simpleDegree + PERFECT_QUALITY_VALUE.get(this.quality)!
       );
     } else {
       return (
         octaveInterval +
         simpleDegree +
-        IMPERFECT_QUALITY_VALUE.get(this.quality as ImperfectQuality)!
+        IMPERFECT_QUALITY_VALUE.get(this.quality)!
       );
     }
   }

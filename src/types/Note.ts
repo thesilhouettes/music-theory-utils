@@ -12,7 +12,7 @@ import { Interval } from "./Interval";
  * Represent how the key letters map to a position within an octave.
  * Starts from `0`.
  */
-export const LETTER_VALUES = new TwoWayMap<Letter, number>({
+export const LETTER_VALUES = new TwoWayMap({
   C: 0,
   D: 2,
   E: 4,
@@ -36,7 +36,7 @@ export const LETTERS_ARRAY: Letter[] = ["C", "D", "E", "F", "G", "A", "B"];
  * Represents a simple mapping between letter names to a number
  * Also a zero-indexed C major scale degrees.
  */
-export const DEGREE_VALUES = new TwoWayMap<Letter, number>({
+export const DEGREE_VALUES = new TwoWayMap({
   C: 0,
   D: 1,
   E: 2,
@@ -50,7 +50,7 @@ export const DEGREE_VALUES = new TwoWayMap<Letter, number>({
  * Represents a mapping between accidentals and the modifying value.
  * For example, since a sharp raises a half step, the value of it is "+1".
  */
-export const ACCIDENTAL_VALUES = new TwoWayMap<Accidental, number>({
+export const ACCIDENTAL_VALUES = new TwoWayMap({
   b: -1,
   //  "♭" : -1, // U+226D
   bb: -2,
@@ -84,11 +84,10 @@ export const ACCIDENTALS_ARRAY: Accidental[] = [
   "#x",
   "",
 ];
-
 /**
  * A map between accidentals and their English names
  */
-export const ACCIDENTAL_NAMES = new TwoWayMap<Accidental, string>({
+export const ACCIDENTAL_NAMES = new TwoWayMap({
   "#": "sharp",
   "": "natural",
   x: "double sharp",
