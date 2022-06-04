@@ -2,6 +2,14 @@
 
 This file lists all the changes in the project.
 
+## [1.2.0] - 2022-06-04
+
+## Added
+
+- `midiPosition` and `frequency` accessors in `Note`.
+- `fromFrequency`, `isGeneric`, `toGeneric` and `toAbsolute` methods in `Note`.
+- more constants in `Note`.
+
 ## [1.1.0] - 2022-05-22
 
 ## Added

@@ -1,6 +1,6 @@
 {
   "name": "music-theory-utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Calculates intervals, chords, intervals, scales and so on.",
   "main": "dist/index.js",
   "private": false,
@@ -15,6 +15,18 @@
   "license": "MIT",
   "files": [
     "dist"
+  ],
+  "keywords": [
+    "music",
+    "theory",
+    "utils",
+    "helpers",
+    "chords",
+    "interval",
+    "note",
+    "scale",
+    "piano",
+    "midi"
   ],
   "scripts": {
     "watch:ts": "tsc --watch",
