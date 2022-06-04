@@ -1,5 +1,6 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
 import {
+  GenericNoteError,
   ImpossibleQualityError,
   InvalidInputError,
   NotSameTypeError,
@@ -119,6 +120,31 @@ export function alternativeAccidental(accidental: Accidental) {
 export type Octave = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | null;
 
 /**
+ * A mapping object for simplifying triple sharps - interval use
+ */
+const TRIPLE_SHARP_MAP: Record<string, { note: string; incOctave: number }> = {
+  "C#x": { note: "D#", incOctave: 0 },
+  "D#x": { note: "F", incOctave: 0 },
+  "E#x": { note: "G", incOctave: 0 },
+  "F#x": { note: "G#", incOctave: 0 },
+  "G#x": { note: "A#", incOctave: 0 },
+  "A#x": { note: "C", incOctave: 1 },
+  "B#x": { note: "D", incOctave: 1 },
+};
+
+/**
+ * A mapping object for simplifying triple flats - interval use
+ */
+const TRIPLE_FLAT_MAP: Record<string, { note: string; decOctave: number }> = {
+  Cbbb: { note: "A", decOctave: 1 },
+  Dbbb: { note: "B", decOctave: 1 },
+  Ebbb: { note: "Db", decOctave: 0 },
+  Fbbb: { note: "D", decOctave: 0 },
+  Gbbb: { note: "E", decOctave: 0 },
+  Abbb: { note: "Gb", decOctave: 0 },
+  Bbbb: { note: "Ab", decOctave: 0 },
+};
+/**
  * Represents a note in music.
  */
 export class Note {
@@ -148,6 +174,16 @@ export class Note {
    * There are 88 keys in the piano, and the index starts from 0
    */
   static C8_POSITION = 87;
+
+  /**
+   * The midi position of A0
+   */
+  static A0_MIDI_POSITION = 21;
+
+  /**
+   * The midi position for G9
+   */
+  static G9_MIDI_POSITION = 127;
 
   /**
    * How many white keys and black keys are there in an octave
@@ -187,6 +223,36 @@ export class Note {
     } else {
       return remainder;
     }
+  }
+
+  /**
+   * Get the midi position of the note instead of the position
+   * used in this library
+   */
+  get midiPosition() {
+    if (this.isGeneric()) throw new GenericNoteError();
+    return Note.A0_MIDI_POSITION + this.value;
+  }
+
+  /**
+   * Get the frequency of the note
+   * @remarks the frequency is based on A4 = 440 Hertz
+   */
+  get frequency() {
+    if (this.isGeneric()) throw new GenericNoteError();
+    // 69 is the midi position of the concert pitch A4
+    return 440 * 2 ** ((this.midiPosition - 69) / Note.POSITIONS_PER_OCTAVE);
+  }
+
+  /**
+   * Get the midi position of a frequency.
+   * @param freq frequency of the note
+   * @returns a midi position (not absolute position in this library)
+   * @remarks If you want to transform it to absolute position, subtract it with @link {Note.A0_MIDI_POSITION}
+   * @remarks it only looks for the nearest midi position and not detect frequencies that are between semitones
+   */
+  static fromFrequency(freq: number) {
+    return Math.round(Note.POSITIONS_PER_OCTAVE * Math.log2(freq / 440) + 69);
   }
 
   /**
@@ -495,5 +561,55 @@ export class Note {
    */
   toString() {
     return this.pitch + this.accidental + (this.octave ?? "");
+  }
+
+  /**
+   * Turns an absolute note into a generic note
+   * @returns a new note without the octave
+   */
+  toGeneric() {
+    return new Note(this.pitch, this.accidental);
+  }
+
+  /**
+   * Turn a note into absolute by specifying an octave
+   * @remarks toAbsolute will return the same note if the note is already absolute
+   * @param octave octave of the new note (cannot be null)
+   * @returns a new note that is absolute
+   */
+  toAbsolute(octave: Exclude<Octave, null>) {
+    if (!this.isGeneric()) return this;
+    return new Note(this.pitch, this.accidental, octave);
+  }
+
+  /**
+   * Is this note generic. (i.e. without an octave)
+   * @returns a boolean indicating if this note is generic
+   */
+  isGeneric() {
+    return this.octave === null;
+  }
+
+  /**
+   * Converts triple sharps and triple flats to a simpler accidental.
+   * Currently it converts triple sharps to sharps or natural
+   * and it converts triple flats to flats or natural.
+   * If you want to convert them to double flats and sharps, then you may want to use @link {Note.fromAbsoluteValue}.
+   * @returns another note of a simpler accidental. If the note is not a triple, then return itself
+   */
+  simplifyAccidental() {
+    if (this.accidental === "#x") {
+      const obj = TRIPLE_SHARP_MAP[this.pitch + this.accidental];
+      const newNote = obj.note;
+      const newOctave = this.octave ? this.octave + obj.incOctave : "";
+      return Note.from(`${newNote}${newOctave}`);
+    } else if (this.accidental === "bbb") {
+      const obj = TRIPLE_FLAT_MAP[this.pitch + this.accidental];
+      const newNote = obj.note;
+      const newOctave = this.octave ? this.octave - obj.decOctave : "";
+      return Note.from(`${newNote}${newOctave}`);
+    } else {
+      return this;
+    }
   }
 }

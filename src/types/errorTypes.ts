@@ -53,3 +53,12 @@ export class NotSameTypeError extends Error {
     super("The notes are not the same type");
   }
 }
+
+/**
+ * This error will be thrown when a function that works with absolute notes uses generic notes
+ */
+export class GenericNoteError extends Error {
+  constructor() {
+    super("This note is not an absolute note!");
+  }
+}

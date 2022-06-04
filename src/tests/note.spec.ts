@@ -1,4 +1,5 @@
 import {
+  GenericNoteError,
   ImpossibleQualityError,
   InvalidInputError,
   NotSameTypeError,
@@ -445,6 +446,76 @@ describe("Note type", () => {
     test("retain accidentals that is not listed", function () {
       expect(alternativeAccidental("#")).toEqual("#");
       expect(alternativeAccidental("b")).toEqual("b");
+    });
+  });
+
+  describe("simply accidentals", function () {
+    test("triple sharps", function () {
+      expect(new Note("B", "#x", 4).simplifyAccidental()).toEqual(
+        new Note("D", "", 5)
+      );
+      expect(new Note("D", "#x", 3).simplifyAccidental()).toEqual(
+        new Note("F", "", 3)
+      );
+      expect(new Note("F", "#x", 2).simplifyAccidental()).toEqual(
+        new Note("G", "#", 2)
+      );
+    });
+
+    test("triple flats", function () {
+      expect(new Note("B", "bbb", 4).simplifyAccidental()).toEqual(
+        new Note("A", "b", 4)
+      );
+      expect(new Note("C", "bbb", 3).simplifyAccidental()).toEqual(
+        new Note("A", "", 2)
+      );
+      expect(new Note("F", "bbb", 2).simplifyAccidental()).toEqual(
+        new Note("D", "", 2)
+      );
+    });
+  });
+
+  describe("generic absolute conversions", function () {
+    test("is generic works correctly", function () {
+      expect(new Note("B", "#").isGeneric()).toBe(true);
+      expect(new Note("B", "#", 3).isGeneric()).toBe(false);
+    });
+
+    test("to generic works correctly", function () {
+      expect(new Note("C", "", 2).toGeneric()).toEqual(new Note("C", ""));
+      expect(new Note("C", "").toGeneric()).toEqual(new Note("C", ""));
+    });
+
+    test("to absolute works correctly", function () {
+      expect(new Note("C", "").toAbsolute(2)).toEqual(new Note("C", "", 2));
+      expect(new Note("C", "", 4).toAbsolute(2)).toEqual(new Note("C", "", 4));
+    });
+  });
+
+  describe("midi notes", function () {
+    test("midi position works correctly", function () {
+      expect(new Note("C", "", 4).midiPosition).toEqual(60);
+      expect(new Note("E", "#", 5).midiPosition).toEqual(77);
+    });
+
+    test("midi position throws error when working with generic notes", function () {
+      expect(() => new Note("D", "bb").midiPosition).toThrowError(
+        GenericNoteError
+      );
+    });
+
+    test("to frequency works", function () {
+      expect(new Note("G", "", 4).frequency).toBeCloseTo(392.0);
+      expect(new Note("B", "b", 1).frequency).toBeCloseTo(58.27);
+    });
+
+    test("to frequency throws error when working with generic notes", function () {
+      expect(() => new Note("A", "").frequency).toThrowError(GenericNoteError);
+    });
+
+    test("from frequency works", () => {
+      expect(Note.fromFrequency(1975.53)).toBe(95); // about B6
+      expect(Note.fromFrequency(184.6)).toBe(54); // about F#3
     });
   });
 });
