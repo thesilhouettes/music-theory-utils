@@ -1,12 +1,15 @@
 import { TwoWayMap } from "../utils/TwoWayMap";
 import { InvalidInputError } from "./errorTypes";
 
+/**
+ * Simple interval means interval size that are not compound
+ */
 type SimpleInterval = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 /**
  * Scale degrees to half-steps.
  */
-export const IntervalValues = new TwoWayMap<SimpleInterval, number>({
+export const INTERVAL_VALUES = new TwoWayMap<SimpleInterval, number>({
   1: 0,
   2: 2,
   3: 4,
@@ -20,7 +23,7 @@ export const IntervalValues = new TwoWayMap<SimpleInterval, number>({
  * Mapping between perfect qualities and its value.
  * For example, augmented interval raises the note up by one, so the value is 1.
  */
-export const PerfectQualityValue = new TwoWayMap({
+export const PERFECT_QUALITY_VALUE = new TwoWayMap({
   P: 0,
   A: 1,
   d: -1,
@@ -31,14 +34,14 @@ export const PerfectQualityValue = new TwoWayMap({
  */
 export type PerfectQuality = "P" | "A" | "d";
 
-export const PerfectQualitiesArray: PerfectQuality[] = ["P", "A", "d"];
+export const PERFECT_QUALITIES_ARRAY: PerfectQuality[] = ["P", "A", "d"];
 
 /**
  * Mapping between imperfect qualities and its value.
  * For example, a minor interval lowers the note down by one, so the value is
  * -1.
  */
-export const ImperfectQualityValue = new TwoWayMap({
+export const IMPERFECT_QUALITY_VALUE = new TwoWayMap({
   d: -2,
   m: -1,
   M: 0,
@@ -54,7 +57,12 @@ export type ImperfectQuality = "d" | "m" | "M" | "A";
 /**
  * An array containing all the values of type @link {ImperfectQuality}
  */
-export const ImperfectQualitiesArray: ImperfectQuality[] = ["d", "m", "M", "A"];
+export const IMPERFECT_QUALITIES_ARRAY: ImperfectQuality[] = [
+  "d",
+  "m",
+  "M",
+  "A",
+];
 
 /**
  * Represents an interval, without storing the notes on the two ends.
@@ -86,7 +94,7 @@ export class Interval {
     }
     // verify if the string makes sense
     if (Interval.checkIsPerfectInterval(+size)) {
-      if (PerfectQualityValue.get(quality as PerfectQuality) === undefined) {
+      if (PERFECT_QUALITY_VALUE.get(quality as PerfectQuality) === undefined) {
         throw new InvalidInputError(
           "quality",
           `quality "${quality}" does not exist in a perfect interval`
@@ -94,7 +102,7 @@ export class Interval {
       }
     } else {
       if (
-        ImperfectQualityValue.get(quality as ImperfectQuality) === undefined
+        IMPERFECT_QUALITY_VALUE.get(quality as ImperfectQuality) === undefined
       ) {
         throw new InvalidInputError(
           "quality",
@@ -121,7 +129,7 @@ export class Interval {
     } else {
       octaves = 1 + Math.floor(remainingSize / 7);
     }
-    const simpleDegree = IntervalValues.get(
+    const simpleDegree = INTERVAL_VALUES.get(
       ((this.size + octaves) % 8) as SimpleInterval
     ) as number;
     const octaveInterval = octaves * 12;
@@ -130,13 +138,13 @@ export class Interval {
       return (
         octaveInterval +
         simpleDegree +
-        PerfectQualityValue.get(this.quality as PerfectQuality)!
+        PERFECT_QUALITY_VALUE.get(this.quality as PerfectQuality)!
       );
     } else {
       return (
         octaveInterval +
         simpleDegree +
-        ImperfectQualityValue.get(this.quality as ImperfectQuality)!
+        IMPERFECT_QUALITY_VALUE.get(this.quality as ImperfectQuality)!
       );
     }
   }

@@ -11,7 +11,7 @@ import { Interval } from "./Interval";
  * Represent how the key letters map to a position within an octave.
  * Starts from `0`.
  */
-export const LetterValues = new TwoWayMap<Letter, number>({
+export const LETTER_VALUES = new TwoWayMap<Letter, number>({
   C: 0,
   D: 2,
   E: 4,
@@ -29,13 +29,13 @@ export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 /**
  * All values of @link {Letter} packed into an array
  */
-export const LettersArray: Letter[] = ["C", "D", "E", "F", "G", "A", "B"];
+export const LETTERS_ARRAY: Letter[] = ["C", "D", "E", "F", "G", "A", "B"];
 
 /**
  * Represents a simple mapping between letter names to a number
  * Also a zero-indexed C major scale degrees.
  */
-export const DegreeValues = new TwoWayMap<Letter, number>({
+export const DEGREE_VALUES = new TwoWayMap<Letter, number>({
   C: 0,
   D: 1,
   E: 2,
@@ -49,7 +49,7 @@ export const DegreeValues = new TwoWayMap<Letter, number>({
  * Represents a mapping between accidentals and the modifying value.
  * For example, since a sharp raises a half step, the value of it is "+1".
  */
-export const AccidentalValues = new TwoWayMap<Accidental, number>({
+export const ACCIDENTAL_VALUES = new TwoWayMap<Accidental, number>({
   b: -1,
   //  "♭" : -1, // U+226D
   bb: -2,
@@ -74,7 +74,7 @@ export type Accidental = "b" | "bb" | "bbb" | "#" | "x" | "#x" | "";
 /**
  * All values of accidentals packed into an array
  */
-export const AccidentalsArray: Accidental[] = [
+export const ACCIDENTALS_ARRAY: Accidental[] = [
   "b",
   "bb",
   "bbb",
@@ -84,6 +84,9 @@ export const AccidentalsArray: Accidental[] = [
   "",
 ];
 
+/**
+ * A map between accidentals and their English names
+ */
 export const ACCIDENTAL_NAMES = new TwoWayMap<Accidental, string>({
   "#": "sharp",
   "": "natural",
@@ -169,7 +172,7 @@ export class Note {
    */
   get value() {
     const remainder =
-      LetterValues.get(this.pitch)! + AccidentalValues.get(this.accidental)!;
+      LETTER_VALUES.get(this.pitch)! + ACCIDENTAL_VALUES.get(this.accidental)!;
     // absolute case
     if (this.octave !== null) {
       const octaveBase =
@@ -237,7 +240,7 @@ export class Note {
     ) as Exclude<Octave, null>;
     let remainder =
       ((absoluteValue - Note.C0_POSITION) % Note.POSITIONS_PER_OCTAVE) -
-      AccidentalValues.get(accidental ?? "")!;
+      ACCIDENTAL_VALUES.get(accidental ?? "")!;
     // sometimes remainder may go beyond 11 and 0, we need to loop around
     if (remainder < 0) {
       remainder += 12;
@@ -246,7 +249,7 @@ export class Note {
       remainder -= 12;
       octave += 1;
     }
-    const letter = LetterValues.getRev(remainder);
+    const letter = LETTER_VALUES.getRev(remainder);
     if (!letter) {
       throw new ImpossibleQualityError(
         "a note with this accidental does not exist for this position"
@@ -280,7 +283,7 @@ export class Note {
     const accidental = results[2] ?? "";
     const octave = results[3];
 
-    if (AccidentalValues.get(accidental as Accidental) === undefined) {
+    if (ACCIDENTAL_VALUES.get(accidental as Accidental) === undefined) {
       throw new InvalidInputError(
         "accidental",
         "This is not a valid accidental"
@@ -338,16 +341,16 @@ export class Note {
     if (degree === 0 || !Number.isInteger(degree)) {
       throw new InvalidInputError("degree", "Degree is invalid");
     }
-    const index = DegreeValues.get(letter)!;
+    const index = DEGREE_VALUES.get(letter)!;
     if (degree > 1) {
-      return DegreeValues.getRev((index + degree - 1) % 7)!;
+      return DEGREE_VALUES.getRev((index + degree - 1) % 7)!;
     } else if (degree == 1) {
       return letter;
     }
     // degree < -1
     else {
       const remainder = (index + degree) % 7;
-      return DegreeValues.getRev(
+      return DEGREE_VALUES.getRev(
         remainder > 0 ? remainder + 1 : remainder + 8
       )!;
     }
@@ -376,11 +379,11 @@ export class Note {
     } else {
       nextInterval = (this.value + +interval) % 12;
     }
-    const nextLetterValue = LetterValues.get(nextLetter)!;
+    const nextLetterValue = LETTER_VALUES.get(nextLetter)!;
     // now we only focus on simple intervals
     for (const accidental of ["", "#", "b", "x", "bb", "#x", "bbb"]) {
       let withAccidental =
-        nextLetterValue + AccidentalValues.get(accidental as Accidental)!;
+        nextLetterValue + ACCIDENTAL_VALUES.get(accidental as Accidental)!;
       if (withAccidental >= 12) {
         withAccidental -= 12;
       } else if (withAccidental < 0) {
@@ -412,7 +415,7 @@ export class Note {
       throw new NotSameTypeError();
     }
     let relativeSize =
-      DegreeValues.get(rhs.pitch)! - DegreeValues.get(this.pitch)! + 1;
+      DEGREE_VALUES.get(rhs.pitch)! - DEGREE_VALUES.get(this.pitch)! + 1;
     // sometimes this.pitch may be larger than rhs.pitch
     if (relativeSize <= 0) {
       relativeSize += 7;
