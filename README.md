@@ -18,7 +18,15 @@ A Chord is merely a vertical stack of notes. In this library, a chord is defined
 
 A Scale is defined similarly to a Chord.
 
-Read the docs for more details.
+Read the [docs](https://thesilhouettes.github.io/music-theory-utils/) for more details.
+
+# Installation
+
+This package is published in npm. To install it, run:
+
+```sh
+npm install music-theory-utils
+```
 
 # Some Small Examples
 
